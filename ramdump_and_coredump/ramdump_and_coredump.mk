@@ -1,7 +1,7 @@
 PRODUCT_PACKAGES += \
   sscoredump \
 
-PRODUCT_PACKAGES_DEBUG += \
+PRODUCT_PACKAGES_ENG += \
     dump_ramdump \
     ramdump \
 

@@ -13,5 +13,5 @@ PRODUCT_PACKAGES += \
 	sitril-gps \
 	android.hardware.location.gps.prebuilt.xml
 
-PRODUCT_PACKAGES_DEBUG += \
+PRODUCT_PACKAGES_ENG += \
 	init.gps_log.rc

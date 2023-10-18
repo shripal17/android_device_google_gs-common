@@ -15,7 +15,7 @@ PRODUCT_PACKAGES += \
     dump_gsc.sh
 
 # USERDEBUG ONLY: Install test packages
-PRODUCT_PACKAGES_DEBUG += citadel_integration_tests \
+PRODUCT_PACKAGES_ENG += citadel_integration_tests \
                           pwntest \
                           nugget_targeted_tests \
                           CitadelProvision \

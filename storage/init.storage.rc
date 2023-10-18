@@ -1,4 +1,4 @@
-on property:ro.build.type=userdebug
+on property:ro.build.type=eng
     write /dev/sys/block/bootdevice/pixel/enable_pixel_ufs_logging 1
     chown system /dev/sg3
 
