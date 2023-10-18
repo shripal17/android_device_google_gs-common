@@ -1,5 +1,5 @@
 PRODUCT_PACKAGES += battery_mitigation
-ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
+ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
 PRODUCT_PACKAGES += BrownoutDetection
 endif
 

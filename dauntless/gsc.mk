@@ -16,8 +16,10 @@ PRODUCT_PACKAGES += \
     dump_gsc.sh
 
 # USERDEBUG ONLY: Install test packages
+ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
 PRODUCT_PACKAGES_DEBUG += citadel_integration_tests \
                           pwntest \
                           nugget_targeted_tests \
                           CitadelProvision
+endif
 endif

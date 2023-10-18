@@ -9,7 +9,9 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/gs-common/pixel_ril/co
 
 PRODUCT_PACKAGES += ril-extension
 
+ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
 PRODUCT_PACKAGES_DEBUG += libgooglerilmemmonitor
+endif
 
 PRODUCT_SOONG_NAMESPACES += \
     vendor/google/tools/ril-extension-service \
