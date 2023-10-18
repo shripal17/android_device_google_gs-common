@@ -9,7 +9,7 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/gs-common/pixel_ril/co
 
 PRODUCT_PACKAGES += ril-extension
 
-PRODUCT_PACKAGES_DEBUG += libgooglerilmemmonitor
+PRODUCT_PACKAGES_ENG += libgooglerilmemmonitor
 
 PRODUCT_SOONG_NAMESPACES += \
     vendor/google/tools/ril-extension-service \

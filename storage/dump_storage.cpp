@@ -179,7 +179,7 @@ int main() {
 
     printf("\n------ UFS error history ------\n");
     std::string build_type = android::base::GetProperty(BUILD_TYPE_PROPERTY, "");
-    if (build_type == "userdebug") {
+    if (build_type == "eng") {
         std::string sg_read_buffer = "/vendor/bin/sg_read_buffer";
         std::ifstream sg_read_buffer_file(sg_read_buffer.c_str());
         if (sg_read_buffer_file.is_open()) {

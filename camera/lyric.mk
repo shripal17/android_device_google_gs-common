@@ -31,8 +31,8 @@ PRODUCT_SOONG_NAMESPACES += \
     vendor/google/camera/google_3a/libs_v4/gHAWB/native_coverage
 
 # Calibration tool for debug builds
-PRODUCT_PACKAGES_DEBUG += tarasque_test
-PRODUCT_PACKAGES_DEBUG += ProtoCalibGenerator
+PRODUCT_PACKAGES_ENG += tarasque_test
+PRODUCT_PACKAGES_ENG += ProtoCalibGenerator
 
 endif  # vendor/google/camera check
 
