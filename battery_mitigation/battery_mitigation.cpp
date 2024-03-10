@@ -16,15 +16,20 @@
 
 #define LOG_TAG "battery-mitigation"
 
-#include <battery_mitigation/BatteryMitigation.h>
 #include <android/binder_process.h>
+#include <battery_mitigation/BatteryMitigation.h>
+#include <battery_mitigation/BatteryMitigationService.h>
+#include <sys/resource.h>
+#include <system/thread_defs.h>
 
 #define COUNT_LIMIT 10
 
 using android::hardware::google::pixel::BatteryMitigation;
+using android::hardware::google::pixel::BatteryMitigationService;
 using android::hardware::google::pixel::MitigationConfig;
 
 android::sp<BatteryMitigation> bmSp;
+android::sp<BatteryMitigationService> batteryMitigationService;
 
 const struct MitigationConfig::Config cfg = {
     .SystemPath = {
@@ -67,6 +72,69 @@ const struct MitigationConfig::Config cfg = {
     .TimestampFormat = "%Y-%m-%d %H:%M:%S",
 };
 
+const struct MitigationConfig::EventThreadConfig eventThreadCfg = {
+    .NumericSysfsStatPaths = {
+        {"cpu0_freq", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"},
+        {"cpu1_freq", "/sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq"},
+        {"cpu2_freq", "/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq"},
+        {"battery_temp", "/dev/thermal/tz-by-name/battery/temp"},
+        {"battery_cycle", "/dev/thermal/tz-by-name/battery_cycle/temp"},
+        {"voltage_now", "/sys/class/power_supply/battery/voltage_now"},
+        {"current_now", "/sys/class/power_supply/battery/current_now"},
+    },
+    .TriggeredIdxPath = "/sys/devices/virtual/pmic/mitigation/br_stats/triggered_idx",
+    .triggeredStatePath[android::hardware::google::pixel::UVLO1] =
+        "/sys/devices/virtual/pmic/mitigation/triggered_state/uvlo1_triggered",
+    .triggeredStatePath[android::hardware::google::pixel::UVLO2] =
+        "/sys/devices/virtual/pmic/mitigation/triggered_state/uvlo2_triggered",
+    .triggeredStatePath[android::hardware::google::pixel::OILO1] =
+        "/sys/devices/virtual/pmic/mitigation/triggered_state/oilo1_triggered",
+    .triggeredStatePath[android::hardware::google::pixel::OILO2] =
+        "/sys/devices/virtual/pmic/mitigation/triggered_state/oilo2_triggered",
+    .triggeredStatePath[android::hardware::google::pixel::SMPL] =
+        "/sys/devices/virtual/pmic/mitigation/triggered_state/smpl_triggered",
+    .BrownoutStatsPath = "/sys/devices/virtual/pmic/mitigation/br_stats/stats",
+    .StoringPath = "/data/vendor/mitigation/thismeal.bin",
+    .ParsedThismealPath = "/data/vendor/mitigation/thismeal.txt",
+    .ParsedLastmealPath = "/data/vendor/mitigation/lastmeal.txt",
+    .ParsedLastmealCSVPath = "/data/vendor/mitigation/lastmeal.csv",
+    .FvpStatsPath = "/sys/devices/platform/acpm_stats/fvp_stats",
+    .PmicCommon = {
+                /* Main Pmic */
+                {
+                    .OdpmDir = "/sys/bus/iio/devices/iio:device0",
+                    .OdpmEnabledRailsPath = "/sys/bus/iio/devices/iio:device0/enabled_rails",
+                    .PmicNamePath = "/sys/bus/iio/devices/iio:device0/name",
+                },
+                /* Sub Pmic */
+                {
+                    .OdpmDir = "/sys/bus/iio/devices/iio:device1",
+                    .OdpmEnabledRailsPath = "/sys/bus/iio/devices/iio:device1/enabled_rails",
+                    .PmicNamePath = "/sys/bus/iio/devices/iio:device1/name",
+                },
+    },
+    .PlatformSpecific = {
+                .NumericSysfsStatPaths = {
+                    {
+                        .name = "battery_soc",
+                        .paths = {
+                            "/sys/class/power_supply/max77759fg/capacity",
+                            "/sys/class/power_supply/max77779fg/capacity",
+                        },
+                    },
+                    {
+                        .name = "gpu_freq",
+                        .paths = {
+                            "/sys/devices/platform/1c500000.mali/cur_freq",
+                            "/sys/devices/platform/28000000.mali/cur_freq",
+                            "/sys/devices/platform/1f000000.mali/cur_freq",
+                        },
+                    },
+
+                },
+    },
+};
+
 const char kReadyFilePath[] = "/sys/devices/virtual/pmic/mitigation/instruction/ready";
 const char kReadyProperty[] = "vendor.brownout.mitigation.ready";
 const char kLastMealPath[] = "/data/vendor/mitigation/lastmeal.txt";
@@ -74,25 +142,54 @@ const char kBRRequestedProperty[] = "vendor.brownout_reason";
 const char kLastMealProperty[] = "vendor.brownout.br.feasible";
 const std::regex kTimestampRegex("^\\S+\\s[0-9]+:[0-9]+:[0-9]+\\S+$");
 
-int main(int /*argc*/, char ** /*argv*/) {
+int main(int argc, char **argv) {
+    batteryMitigationService = new BatteryMitigationService(eventThreadCfg);
+    if (!batteryMitigationService) {
+        return 0;
+    }
+    bool brownoutStatsBinarySupported = batteryMitigationService->isBrownoutStatsBinarySupported();
+    if (argc == 2) {
+        if(strcmp(argv[1], "-d") == 0 &&
+           brownoutStatsBinarySupported) {
+            /* Create thismeal.txt from thismeal.bin */
+            batteryMitigationService->genParsedMeal(eventThreadCfg.ParsedThismealPath);
+        }
+        return 0;
+    }
+
+    setpriority(PRIO_PROCESS, 0, ANDROID_PRIORITY_AUDIO);
     auto batteryMitigationStartTime = std::chrono::system_clock::now();
     ABinderProcess_setThreadPoolMaxThreadCount(1);
     ABinderProcess_startThreadPool();
-    bmSp = new BatteryMitigation(cfg);
-    if (!bmSp) {
-        return 0;
-    }
-    bool mitigationLogTimeValid = bmSp->isMitigationLogTimeValid(batteryMitigationStartTime,
-                                                                 cfg.LogFilePath,
-                                                                 cfg.TimestampFormat,
-                                                                 kTimestampRegex);
+
+    bool mitigationLogTimeValid;
     std::string reason = android::base::GetProperty(kBRRequestedProperty, "");
-    if (!reason.empty() && mitigationLogTimeValid) {
-        std::ifstream src(cfg.LogFilePath, std::ios::in);
-        std::ofstream dst(kLastMealPath, std::ios::out);
-        dst << src.rdbuf();
-        android::base::SetProperty(kLastMealProperty, "1");
+    if (brownoutStatsBinarySupported) {
+        /* Create lastmeal.txt if the dump time in thismeal.bin are valid */
+        mitigationLogTimeValid = batteryMitigationService->isTimeValid(eventThreadCfg.StoringPath,
+                                                                       batteryMitigationStartTime);
+        if (!reason.empty() && mitigationLogTimeValid &&
+            batteryMitigationService->genParsedMeal(eventThreadCfg.ParsedLastmealPath) &&
+            batteryMitigationService->genLastmealCSV(eventThreadCfg.ParsedLastmealCSVPath)) {
+            android::base::SetProperty(kLastMealProperty, "1");
+        }
+    } else{
+        bmSp = new BatteryMitigation(cfg);
+        if (!bmSp) {
+            return 0;
+        }
+        mitigationLogTimeValid = bmSp->isMitigationLogTimeValid(batteryMitigationStartTime,
+                                                                cfg.LogFilePath,
+                                                                cfg.TimestampFormat,
+                                                                kTimestampRegex);
+        if (!reason.empty() && mitigationLogTimeValid) {
+            std::ifstream src(cfg.LogFilePath, std::ios::in);
+            std::ofstream dst(kLastMealPath, std::ios::out);
+            dst << src.rdbuf();
+            android::base::SetProperty(kLastMealProperty, "1");
+        }
     }
+
     bool isBatteryMitigationReady = false;
     std::string ready_str;
     int val = 0;
@@ -111,6 +208,10 @@ int main(int /*argc*/, char ** /*argv*/) {
     }
     if (isBatteryMitigationReady) {
         android::base::SetProperty(kReadyProperty, "1");
+    }
+    if (isBatteryMitigationReady && brownoutStatsBinarySupported) {
+        /* Start BrownoutEventThread to poll brownout event from kernel */
+        batteryMitigationService->startBrownoutEventThread();
     }
     while (true) {
         pause();
