@@ -62,6 +62,14 @@ AdaptiveDvfsStateResidencyDataProvider::AdaptiveDvfsStateResidencyDataProvider(
             }
         }
 
+        // Cpufreq data is sorted in ascending order, but power stats are sorted
+        // in descending order. Reverse sorting to maintain consistency with
+        // other power stats.
+        if (states.size() > 1 &&
+                std::atoll(states[0].second.c_str()) < std::atoll(states[1].second.c_str())) {
+            std::reverse(states.begin(), states.end());
+        }
+
         mPowerEntities.push_back({powerEntities[i].first, std::move(states)});
     }
 

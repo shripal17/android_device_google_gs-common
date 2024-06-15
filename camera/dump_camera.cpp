@@ -45,6 +45,7 @@ int main() {
   dumpLogs(kCameraLogDir.data(), cameraDestDir.c_str(), 5, "high-drop-rate-");
   dumpLogs(kCameraLogDir.data(), cameraDestDir.c_str(), 5, "watchdog-");
   dumpLogs(kCameraLogDir.data(), cameraDestDir.c_str(), 5, "camera-ended-");
+  dumpLogs(kCameraLogDir.data(), cameraDestDir.c_str(), 5, "fatal-error-");
   dumpLogs(kGraphStateDumpDir.data(), cameraDestDir.c_str(), 5,
            "hal_graph_state_");
 

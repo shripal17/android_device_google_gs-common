@@ -34,6 +34,8 @@ int main() {
     if (tcpdumpEnabled) {
         dumpLogs(TCPDUMP_LOG_DIRECTORY, BUGREPORT_PACKING_DIR, ::android::base::GetIntProperty(TCPDUMP_NUMBER_BUGREPORT, 5), TCPDUMP_LOG_PREFIX);
     }
+    copyFile("/data/vendor/radio/adum_log", "/data/vendor/radio/logs/always-on/all_logs/adum_log");
+    copyFile("/data/vendor/radio/adum_log_old", "/data/vendor/radio/logs/always-on/all_logs/adum_log_old");
     copyFile("/data/vendor/radio/metrics_data", "/data/vendor/radio/logs/always-on/all_logs/metrics_data");
     copyFile("/data/vendor/radio/omadm_logs.txt", "/data/vendor/radio/logs/always-on/all_logs/omadm_logs.txt");
     copyFile("/data/vendor/radio/power_anomaly_data.txt", "/data/vendor/radio/logs/always-on/all_logs/power_anomaly_data.txt");

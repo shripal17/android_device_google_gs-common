@@ -34,3 +34,7 @@ userdebug_or_eng(`
 ')
 
 wakelock_use(hal_audio_default);
+
+vndbinder_use(hal_audio_default);
+allow hal_audio_default aocx:service_manager find;
+binder_call(hal_audio_default, aocxd);

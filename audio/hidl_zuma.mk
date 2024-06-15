@@ -31,6 +31,7 @@ PRODUCT_PACKAGES += \
 	audio.bluetooth.default \
 	audio.r_submix.default \
 	audio_spk_35l41 \
+	audio_spk_tas25xx \
 	audio_hdmi_aoc \
 	sound_trigger.primary.$(TARGET_BOARD_PLATFORM)
 

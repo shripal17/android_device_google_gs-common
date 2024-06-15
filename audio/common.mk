@@ -6,7 +6,7 @@ PRODUCT_PACKAGES += \
 	libmahalcontroller \
 	libAlgFx_HiFi3z
 
-ifneq ($(RELEASE_PIXEL_AIDL_AUDIO_HAL),true)
+ifneq ($(USE_AUDIO_HAL_AIDL),true)
 ## AudioHAL Configurations
 PRODUCT_COPY_FILES += \
 	frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration_7_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/a2dp_audio_policy_configuration_7_0.xml \

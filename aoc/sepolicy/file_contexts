@@ -27,11 +27,14 @@
 /dev/acd-audio_ap_offload_rx        u:object_r:aoc_device:s0
 /dev/acd-audio_ap_offload_tx        u:object_r:aoc_device:s0
 /dev/acd-mel_processor              u:object_r:aoc_device:s0
+/dev/acd-aocx_control               u:object_r:aoc_device:s0
+/dev/acd-mc_headpos                 u:object_r:aoc_device:s0
 
 # AoC vendor binaries
 /vendor/bin/aocd                    u:object_r:aocd_exec:s0
 /vendor/bin/aocdump                 u:object_r:aocdump_exec:s0
 /vendor/bin/dump/dump_aoc           u:object_r:dump_aoc_exec:s0
+/vendor/bin/aocxd                   u:object_r:aocxd_exec:s0
 
 # AoC audio files
 /vendor/etc/aoc(/.*)?               u:object_r:aoc_audio_file:s0

@@ -20,6 +20,7 @@ ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
 PRODUCT_PACKAGES_DEBUG += citadel_integration_tests \
                           pwntest \
                           nugget_targeted_tests \
-                          CitadelProvision
+                          CitadelProvision \
+                          nugget_aidl_test_weaver
 endif
 endif

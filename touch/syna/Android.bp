@@ -5,7 +5,8 @@ package {
 sh_binary {
     name: "dump_syna.sh",
     src: "dump_syna.sh",
-    init_rc: ["init.touch.syna20.rc"],
+    init_rc: ["init.touch.syna.rc"],
     vendor: true,
     sub_dir: "dump",
 }
+

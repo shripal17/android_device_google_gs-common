@@ -1,7 +1,8 @@
 BOARD_VENDOR_SEPOLICY_DIRS += device/google/gs-common/aoc/sepolicy
 
 PRODUCT_PACKAGES += dump_aoc \
-		    aocd
+		    aocd \
+		    aocxd
 
 ifeq (,$(filter aosp_%,$(TARGET_PRODUCT)))
 # IAudioMetricExt HIDL
@@ -19,5 +20,6 @@ PRODUCT_PACKAGES_DEBUG += \
 	aocdump \
 	aocutil \
 	aoc_audio_cfg \
-	vp_util
+	vp_util \
+	aocx_tool
 endif

@@ -5,6 +5,7 @@ init_daemon_domain(mediacodec_samsung)
 hal_server_domain(mediacodec_samsung, hal_codec2)
 add_service(mediacodec_samsung, eco_service)
 
+binder_use(mediacodec_samsung)
 vndbinder_use(mediacodec_samsung)
 
 allow mediacodec_samsung video_device:chr_file rw_file_perms;
