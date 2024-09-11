@@ -1,5 +1,5 @@
 ifneq ($(TARGET_BUILD_VARIANT), user)
-  ifeq (,$(filter aosp_%, $(TARGET_PRODUCT))) # Skip aosp target product
+  ifeq (,$(filter aosp_% lineage_%, $(TARGET_PRODUCT))) # Skip aosp target product
     PRODUCT_PACKAGES_DEBUG += \
       Gyotaku
 
