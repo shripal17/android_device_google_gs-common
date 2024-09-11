@@ -4,7 +4,7 @@ PRODUCT_PACKAGES += dump_aoc \
 		    aocd \
 		    aocxd
 
-ifeq (,$(filter aosp_%,$(TARGET_PRODUCT)))
+ifeq (,$(filter aosp_% bliss_%,$(TARGET_PRODUCT)))
 # IAudioMetricExt HIDL
 PRODUCT_PACKAGES += \
     vendor.google.audiometricext@1.0-service-vendor

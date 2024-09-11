@@ -1,5 +1,5 @@
 # When neither AOSP nor factory targets
-ifeq (,$(filter aosp_% factory_%, $(TARGET_PRODUCT)))
+ifeq (,$(filter aosp_% factory_% bliss_%, $(TARGET_PRODUCT)))
   PRODUCT_PACKAGES += BetterBugStub
   PRODUCT_PACKAGES_DEBUG += BetterBug
 endif

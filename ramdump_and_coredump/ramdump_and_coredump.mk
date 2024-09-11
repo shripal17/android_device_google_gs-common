@@ -6,7 +6,7 @@ PRODUCT_PACKAGES_DEBUG += \
     ramdump \
 
 # When neither AOSP nor factory targets
-ifeq (,$(filter aosp_% factory_%, $(TARGET_PRODUCT)))
+ifeq (,$(filter aosp_% factory_% bliss_%, $(TARGET_PRODUCT)))
   PRODUCT_PACKAGES += SSRestartDetector
   PRODUCT_PACKAGES_DEBUG += RamdumpUploader
 endif
