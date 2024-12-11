@@ -1,6 +1,6 @@
 allow hal_camera_default camera_binder_service:service_manager find;
 # Allow Lyric Hal to find the LyricConfigProvider service through ServiceManager.
-allow hal_camera_default vendor_camera_lyricconfigprovider_service:service_manager find;
+allow hal_camera_default camera_lyricconfigprovider_service:service_manager find;
 
 allow hal_camera_default hal_pixel_remote_camera_service:service_manager find;
 
@@ -8,6 +8,5 @@ binder_call(hal_camera_default, vendor_pbcs_app);
 
 binder_call(hal_camera_default, vendor_pcs_app);
 
-# Allow Lyric HAL to start ISP Service and Image Processing HAL
-add_service(hal_camera_default, vendor_camera_isp_service)
+# Allow Lyric HAL to start Image Processing HAL
 add_service(hal_camera_default, vendor_image_processing_hal_service)
